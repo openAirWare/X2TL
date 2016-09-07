@@ -1,4 +1,5 @@
-﻿#region [ using ]
+﻿/*! X2TL v1.1.0 | (c) 2010, 2016 Mark Brown, openAirWare | https://opensource.org/licenses/MIT */
+#region [ using ]
 using System;
 using System.Collections;
 using System.Collections.Generic;
