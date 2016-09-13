@@ -1333,6 +1333,8 @@ namespace RelWare
             public int multipartResultStartIndex = -1;
             public int multipartResultEndIndex = -1;
             public bool multipart = false;
+            public bool external = false;
+
 
             public override void Process(XmlNode pSourceContextNode, XmlNode pSupportingTemplatesNode, ref ArrayList pResults, ref System.Collections.Specialized.HybridDictionary pVariables, ref int pIndex)
             {
@@ -1365,12 +1367,16 @@ namespace RelWare
                     pIndex = this.multipartResultEndIndex + 1;
 
                 }
-                else
+                else if (this.external)
                 {
                     string variableName = this.variableName.Trim();
-                    string trimmed = this.contextXPath.Trim();
+                    string filepath = this.contextXPath.Trim();
 
-                    XmlNode context = pSourceContextNode;
+                    XmlNode context;
+
+                    XmlDocument extDoc = new XmlDocument();
+                    extDoc.Load(filepath);
+                    context = extDoc.DocumentElement;
 
                     XPathNavigator navigator = context.CreateNavigator();
                     XsltArgumentList varList = new XsltArgumentList();
@@ -1382,8 +1388,7 @@ namespace RelWare
 
                     CustomContext customContext = new CustomContext(new NameTable(), varList);
 
-
-                    XPathExpression xpath = XPathExpression.Compile(trimmed);
+                    XPathExpression xpath = XPathExpression.Compile("/*");
 
                     xpath.SetContext(customContext);
 
@@ -1400,6 +1405,43 @@ namespace RelWare
                     }
 
 
+
+                    pIndex++;
+
+                }
+                else
+                {
+                    string variableName = this.variableName.Trim();
+                    string trimmed = this.contextXPath.Trim();
+
+
+                    XmlNode context = pSourceContextNode;
+
+                    XPathNavigator navigator = context.CreateNavigator();
+                    XsltArgumentList varList = new XsltArgumentList();
+
+                    foreach (string key in pVariables.Keys)
+                    {
+                        varList.AddParam(key, string.Empty, pVariables[key]);
+                    }
+
+                    CustomContext customContext = new CustomContext(new NameTable(), varList);
+
+                    XPathExpression xpath = XPathExpression.Compile(trimmed);
+
+                    xpath.SetContext(customContext);
+
+                    //object commandOutput = navigator.Evaluate(trimmed);
+                    object commandOutput = navigator.Evaluate(xpath);
+
+                    if (commandOutput is XPathNodeIterator)
+                    {
+                        pVariables[variableName] = (XPathNodeIterator)commandOutput;
+                    }
+                    else
+                    {
+                        pVariables[variableName] = commandOutput.ToString();
+                    }
 
                     pIndex++;
                 }
@@ -1852,6 +1894,22 @@ namespace RelWare
 
                                         if (fragCommand.parameters.Length > 1)
                                             ((VariableCommandInfo)fragCommand.supportingInfo).variableName = fragCommand.parameters[1];
+                                        break;
+
+
+
+                                    case ":::":
+                                    case "load":
+                                        fragCommand.commandType = CommandTypes.ctVariable;
+                                        fragCommand.supportingInfo = new VariableCommandInfo();
+                                        ((VariableCommandInfo)fragCommand.supportingInfo).external = true;
+
+                                        if (fragCommand.parameters.Length > 2)
+                                        {
+                                            ((VariableCommandInfo)fragCommand.supportingInfo).variableName = fragCommand.parameters[1];
+
+                                            ((VariableCommandInfo)fragCommand.supportingInfo).contextXPath = fragCommand.parameters[2];
+                                        }
                                         break;
 
 

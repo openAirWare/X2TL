@@ -27,9 +27,10 @@
       * [If ... Else ...EndIf (/If)](#if-else-endif)
     * [Looping Commands](#looping-commands)
       * [Each ... EndEach (/Each)](#each-endeach)
-    * Variable Commands
+    * [Variable Commands](#variable-commands)
       * [Variable (var, :=)](#variable-)
-      * [MultiVar (mvar, ::=) ... /MultiVar (/mvar, /::=, endmultivar, endmvar)](#multivar)
+      * [MultiVar (mvar, ::=) ... /MultiVar (/mvar, /::=, endmultivar, endmvar)](#multivar-mvar-)
+      * [Load (:::)](#load-)
     * [Template Commands](#template-commands)
       * [Apply (%)](#apply-)
       * [ParamApply (%%)](#paramapply-)
@@ -701,6 +702,50 @@ Output:
 ```
 <span>User HFINE has CHECKED-IN (Busy until after lunch)/span>
 ```
+
+
+
+##### Load (:::)
+
+The *Load* command is used to load an external document, and provide asccess to it via a variable.  The root element of the external document will be returned as the variable.  This command has a shorthand equivalent of: **:::**. 
+This command takes two parameters, the Name, and the FilePath of the external document to be loaded.  
+
+Context Node:
+```
+<Allergies>
+  <Allergy id="1001" code="010101" codeSystemCode="2.1.1.1.1.1.1.1" name="PEANUTS" />
+  <Allergy id="1002" code="010102" codeSystemCode="2.1.1.1.1.1.1.2" name="CODEINE" />
+  <Allergy id="1003" code="010103" codeSystemCode="2.1.1.1.1.1.1.3" name="LATEX" />
+</Allergies>
+```
+
+Template Sample:
+```
+<template>
+{{ LOAD DATATABLES "..\..\TestFiles\DATATABLES.XML" }}
+{{ EACH Allergy }}
+  {{ VAR CODE @code }}
+  {{ IF $DATATABLES/TEST[@code=$CODE] }}
+    The following Allergy was found in the supporting file: {{ = @name }}
+  {{ /IF }}
+{{ /EACH }}
+</template>
+```
+
+External Source File:
+```
+<DATATABLES>
+	<TEST code="010102" />
+</DATATABLES>
+```
+
+
+Output:
+```
+The following Allergy was found in the supporting file: CODEINE
+```
+
+
 
 
 #### Template Commands

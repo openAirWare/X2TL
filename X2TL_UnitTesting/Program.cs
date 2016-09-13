@@ -921,6 +921,30 @@ namespace X2TL_UnitTesting
 
 
 
+
+            Name = "Load Variable: Test Existence";
+            Desc = "[ Load Variable: Simple Existence Test ]";
+            Source = @"<Allergies><Allergy id=""1001"" code=""010101"" codeSystemCode=""2.1.1.1.1.1.1.1"" name=""PEANUTS"" /><Allergy id=""1002"" code=""010102"" codeSystemCode=""2.1.1.1.1.1.1.2"" name=""CODEINE"" /><Allergy id=""1003"" code=""010103"" codeSystemCode=""2.1.1.1.1.1.1.3"" name=""LATEX"" /></Allergies>";
+            Template = @"<Template>{{ LOAD DATATABLES ""..\..\TestFiles\DATATABLES.XML"" }}{{ IF $DATATABLES/* }}<div>test</div>{{ /IF }}</Template>";
+            Support = @"";
+            Test = @"<div>test</div>";
+
+            tester.Init(Name, Desc, Source, Template, Support, Test);
+            tester.RunTest();
+
+
+            Name = "Load Variable: IF Test on External Source";
+            Desc = "[ Load Variable: IF Test on External Source ]";
+            Source = @"<Allergies><Allergy id=""1001"" code=""010101"" codeSystemCode=""2.1.1.1.1.1.1.1"" name=""PEANUTS"" /><Allergy id=""1002"" code=""010102"" codeSystemCode=""2.1.1.1.1.1.1.2"" name=""CODEINE"" /><Allergy id=""1003"" code=""010103"" codeSystemCode=""2.1.1.1.1.1.1.3"" name=""LATEX"" /></Allergies>";
+            Template = @"<Template>{{ ::: DATATABLES ""..\..\TestFiles\DATATABLES.XML"" }}{{ EACH Allergy }}{{ VAR CODE @code }}{{ IF $DATATABLES/TEST[@code=$CODE] }}{{ COPY . }}{{ /IF }}{{ /EACH }}</Template>";
+            Support = @"";
+            Test = @"<Allergy id=""1002"" code=""010102"" codeSystemCode=""2.1.1.1.1.1.1.2"" name=""CODEINE"" />";
+
+            tester.Init(Name, Desc, Source, Template, Support, Test);
+            tester.RunTest();
+
+
+
             /* TEMPLATE 
                         Name = "Wiki: #";
                         Desc = "[ Wiki: # ]";
