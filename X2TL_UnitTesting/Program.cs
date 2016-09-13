@@ -945,6 +945,45 @@ namespace X2TL_UnitTesting
 
 
 
+            Name = "Load Variable: APPLY Test on External Source";
+            Desc = "[ Load Variable: APPLY using External Source in Supporting Template ]";
+            Source = @"<Allergies><Allergy id=""1001"" code=""010101"" codeSystemCode=""2.1.1.1.1.1.1.1"" name=""PEANUTS"" /><Allergy id=""1002"" code=""010102"" codeSystemCode=""2.1.1.1.1.1.1.2"" name=""CODEINE"" /><Allergy id=""1003"" code=""010103"" codeSystemCode=""2.1.1.1.1.1.1.3"" name=""LATEX"" /></Allergies>";
+            Template = @"<Template>{{ ::: DATATABLES ""..\..\TestFiles\DATATABLES.XML"" }}{{ EACH Allergy}}{{ APPLY Filter }}{{ /EACH }}</Template>";
+            Support = @"<SupportingTemplates><Template name=""Filter"">{{ VAR CODE @code }}{{ VAR CODESYSTEM @codeSystemCode }}{{ IF ($DATATABLES/TEST[(@code=$CODE)and(@codingSystemCode=$CODESYSTEM)]) }}{{ COPY . }}{{ /IF }}</Template></SupportingTemplates>";
+            Test = @"<Allergy id=""1002"" code=""010102"" codeSystemCode=""2.1.1.1.1.1.1.2"" name=""CODEINE"" />";
+
+            tester.Init(Name, Desc, Source, Template, Support, Test);
+            tester.RunTest();
+
+
+
+
+            Name = "Load Variable: PARAMAPPLY Test on External Source";
+            Desc = "[ Load Variable: PARAMAPPLY using External Source in Supporting Template ]";
+            Source = @"<Allergies><Allergy id=""1001"" code=""010101"" codeSystemCode=""2.1.1.1.1.1.1.1"" name=""PEANUTS"" /><Allergy id=""1002"" code=""010102"" codeSystemCode=""2.1.1.1.1.1.1.2"" name=""CODEINE"" /><Allergy id=""1003"" code=""010103"" codeSystemCode=""2.1.1.1.1.1.1.3"" name=""LATEX"" /></Allergies>";
+            Template = @"<Template>{{ ::: DATATABLES ""..\..\TestFiles\DATATABLES.XML"" }}{{ EACH Allergy}}{{ PARAMAPPLY Filter }}{{ := CODE @code }}{{ := CODESYSTEM @codeSystemCode }}{{ /PARAMAPPLY }}{{ /EACH }}</Template>";
+            Support = @"<SupportingTemplates><Template name=""Filter"">{{ IF ($DATATABLES/TEST[(@code=$CODE)and(@codingSystemCode=$CODESYSTEM)]) }}{{ COPY . }}{{ /IF }}</Template></SupportingTemplates>";
+            Test = @"<Allergy id=""1002"" code=""010102"" codeSystemCode=""2.1.1.1.1.1.1.2"" name=""CODEINE"" />";
+
+            tester.Init(Name, Desc, Source, Template, Support, Test);
+            tester.RunTest();
+
+
+
+            Name = "Load Variable: Bringing Data Forward from an External Source";
+            Desc = "[ Load Variable: Bringing Data Forward from an External Source ]";
+            Source = @"<Allergies><Allergy id=""1001"" code=""010101"" codeSystemCode=""2.1.1.1.1.1.1.1"" name=""PEANUTS"" /><Allergy id=""1002"" code=""010102"" codeSystemCode=""2.1.1.1.1.1.1.2"" name=""CODEINE"" /><Allergy id=""1003"" code=""010103"" codeSystemCode=""2.1.1.1.1.1.1.3"" name=""LATEX"" /></Allergies>";
+            Template = @"<Template>{{ ::: DATATABLES ""..\..\TestFiles\DATATABLES.XML"" }}{{ EACH Allergy}}{{ PARAMAPPLY Filter }}{{ := CODE @code }}{{ := CODESYSTEM @codeSystemCode }}{{ /PARAMAPPLY }}{{ /EACH }}</Template>";
+            Support = @"<SupportingTemplates><Template name=""Filter"">{{ IF ($DATATABLES/TEST[(@code=$CODE)and(@codingSystemCode=$CODESYSTEM)]) }}{{ COPY . }}{{ COPY ($DATATABLES/TEST[(@code=$CODE)and(@codingSystemCode=$CODESYSTEM)]) }}{{ /IF }}</Template></SupportingTemplates>";
+            Test = @"<Allergy id=""1002"" code=""010102"" codeSystemCode=""2.1.1.1.1.1.1.2"" name=""CODEINE"" /><TEST code=""010102"" codingSystemCode=""2.1.1.1.1.1.1.2"" />";
+
+            tester.Init(Name, Desc, Source, Template, Support, Test);
+            tester.RunTest();
+
+
+
+
+
             /* TEMPLATE 
                         Name = "Wiki: #";
                         Desc = "[ Wiki: # ]";
